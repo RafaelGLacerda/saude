@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Escolha o Posto</title>
+  <link rel="stylesheet" href="css/postos.css">
+</head>
+<body>
+  <header>
+    <h1>Selecione o Posto de Atendimento</h1>
+    <nav>
+      <button onclick="voltar()">Voltar</button>
+      <button onclick="inicio()">Início</button>
+      <button onclick="historico()">Histórico</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 id="atendimentoSelecionado"></h2>
+    <ul id="listaPostos">
+      <!-- Postos serão inseridos via JS -->
+    </ul>
+  </main>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const atendimento = urlParams.get('atendimento');
+
+    document.getElementById('atendimentoSelecionado').textContent =
+      `Atendimento selecionado: ${atendimento}`;
+
+    // Lista de postos fictícios por região
+    const postos = [
+      { nome: "Posto Central", regiao: "Centro" },
+      { nome: "Unidade Saúde Bairro Sul", regiao: "Zona Sul" },
+      { nome: "Posto Família Nordeste", regiao: "Zona Norte" },
+      { nome: "Policlínica Itapuã", regiao: "Itapuã" },
+      { nome: "USF Boca do Rio", regiao: "Boca do Rio" },
+      { nome: "UBS São Marcos", regiao: "São Marcos" },
+      { nome: "USF Vale das Pedrinhas", regiao: "Vale das Pedrinhas" },
+  { nome: "UBS Fazenda Grande", regiao: "Cajazeiras" },
+  { nome: "USF Santa Cruz", regiao: "Santa Cruz" },
+  { nome: "UBS Pirajá", regiao: "Pirajá" },
+  { nome: "USF Engomadeira", regiao: "Engomadeira" },
+  { nome: "Policlínica Escada", regiao: "Subúrbio" },
+  { nome: "UBS Cosme de Farias", regiao: "Cosme de Farias" },
+  { nome: "USF Sussuarana Velha", regiao: "Sussuarana" },
+  { nome: "USF Pernambués", regiao: "Pernambués" },
+  { nome: "UBS Brotas", regiao: "Brotas" },
+  { nome: "USF São Caetano", regiao: "São Caetano" },
+  { nome: "USF Plataforma", regiao: "Plataforma" },
+  { nome: "Policlínica Cajazeiras", regiao: "Cajazeiras" },
+  { nome: "UBS Narandiba", regiao: "Narandiba" },
+  { nome: "USF Vila Rui Barbosa", regiao: "Liberdade" },
+  { nome: "Policlínica Castelo Branco", regiao: "Castelo Branco" },
+  { nome: "UBS Jardim das Margaridas", regiao: "Jardim das Margaridas" },
+  { nome: "USF São Tomé de Paripe", regiao: "Ilhas/Subúrbio" },
+  { nome: "UBS Tororó", regiao: "Tororó" }
+    ];
+
+    const lista = document.getElementById('listaPostos');
+    postos.forEach(p => {
+      const li = document.createElement('li');
+      li.textContent = `${p.nome} - ${p.regiao}`;
+      li.onclick = () => {
+        window.location.href = `agendamento.html?atendimento=${encodeURIComponent(atendimento)}&posto=${encodeURIComponent(p.nome)}`;
+      };
+      lista.appendChild(li);
+    });
+
+    function voltar() {
+      window.history.back();
+    }
+
+    function inicio() {
+      window.location.href = 'index.html';
+    }
+
+    function historico() {
+      window.location.href = 'historico.html';
+    }
+  </script>
+</body>
+</html>

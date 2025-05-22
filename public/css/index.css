@@ -1,0 +1,103 @@
+/* Reset e base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  height: 100%;
+}
+
+/* Header moderno */
+header {
+  background-color: #1976d2; /* Azul SUS */
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 4px solid #1565c0;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+/* Botão do header */
+nav button {
+  background-color: white;
+  color: #1976d2;
+  border: 2px solid white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+nav button:hover {
+  background-color: #1565c0;
+  color: white;
+  border-color: #1565c0;
+}
+
+/* Conteúdo principal */
+main {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+main h2 {
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+}
+
+/* Lista de atendimentos */
+ul#listaAtendimentos {
+  list-style: none;
+  padding: 0;
+}
+
+ul#listaAtendimentos li {
+  background-color: #e3f2fd;
+  margin: 10px 0;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+ul#listaAtendimentos li:hover {
+  background-color: #bbdefb;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  main {
+    margin: 20px 15px;
+    padding: 15px;
+  }
+
+  header h1 {
+    font-size: 1.2rem;
+  }
+
+  nav button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  ul#listaAtendimentos li {
+    font-size: 0.95rem;
+  }
+}

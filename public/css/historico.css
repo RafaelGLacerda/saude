@@ -1,0 +1,89 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9fcff;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #007b5e;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+nav button {
+  margin: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: white;
+  color: #007b5e;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+nav button:hover {
+  background-color: #e1f3ed;
+}
+
+main {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+}
+
+#infoUsuario {
+  margin-bottom: 1.5rem;
+  font-size: 18px;
+  text-align: center;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.card h3 {
+  color: #007b5e;
+  margin-top: 0;
+}
+
+.card p {
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  nav button {
+    width: 100%;
+    max-width: 300px;
+    font-size: 15px;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  #infoUsuario {
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agendamento</title>
+  <link rel="stylesheet" href="css/agendamento.css" />
+  <style>
+    #mensagemAgendamento {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Agendar Atendimento</h1>
+    <nav>
+      <button onclick="voltar()">Voltar</button>
+      <button onclick="inicio()">Início</button>
+      <button onclick="historico()">Histórico</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="mensagemAgendamento"></div>
+
+    <h2 id="tipoInfo"></h2>
+    <form id="formAgendamento">
+      <label>Nome completo:
+        <input type="text" name="nome" required />
+      </label>
+
+      <label>CPF:
+        <input type="text" name="cpf" required />
+      </label>
+
+      <label>Telefone:
+        <input type="tel" name="telefone" required />
+      </label>
+
+      <label>Descrição:
+        <textarea name="descricao" required placeholder="Descreva o motivo da consulta..."></textarea>
+      </label>
+
+      <label>Data:
+        <input type="date" name="data" required id="dataInput" />
+      </label>
+
+      <label>Horário disponível:
+        <select name="hora" required id="horaSelect">
+          <option value="">Selecione uma data primeiro</option>
+        </select>
+      </label>
+
+      <button type="submit">Agendar</button>
+    </form>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const atendimento = params.get('atendimento');
+    const posto = params.get('posto');
+
+    if (!atendimento || !posto) {
+      alert("Erro: atendimento ou posto não informado na URL.");
+      window.location.href = "index.html";
+    }
+
+    document.getElementById('tipoInfo').innerText =
+      `Agendamento para "${atendimento}" no "${posto}"`;
+
+    const horaSelect = document.getElementById('horaSelect');
+    const dataInput = document.getElementById('dataInput');
+    const mensagemDiv = document.getElementById('mensagemAgendamento');
+    const form = document.getElementById('formAgendamento');
+    const botaoSubmit = form.querySelector('button[type="submit"]');
+
+    function formatarDataHoje() {
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoje.getDate()).padStart(2, '0');
+      return `${ano}-${mes}-${dia}`;
+    }
+
+    // Define o mínimo como hoje e seta valor inicial
+    dataInput.min = formatarDataHoje();
+    dataInput.value = formatarDataHoje();
+
+    dataInput.addEventListener('change', async () => {
+      horaSelect.innerHTML = '';
+      const dataSelecionada = dataInput.value;
+      if (!dataSelecionada) return;
+
+      try {
+        const response = await fetch('http://localhost:3000/agendamentos');
+        const agendamentos = await response.json();
+
+        const ocupados = agendamentos
+          .filter(a => a.data === dataSelecionada && a.posto === posto)
+          .map(a => a.hora);
+
+        const horarios = gerarHorarios();
+        let algumDisponivel = false;
+
+        horarios.forEach(hora => {
+          const option = document.createElement('option');
+          option.value = hora;
+          option.textContent = hora;
+
+          if (ocupados.includes(hora)) {
+            option.disabled = true;
+            option.textContent += ' (Indisponível)';
+          } else {
+            algumDisponivel = true;
+          }
+
+          horaSelect.appendChild(option);
+        });
+
+        if (!algumDisponivel) {
+          const option = document.createElement('option');
+          option.textContent = 'Nenhum horário disponível nesta data.';
+          option.disabled = true;
+          option.selected = true;
+          horaSelect.innerHTML = '';
+          horaSelect.appendChild(option);
+        }
+
+      } catch (error) {
+        alert("Erro ao carregar horários.");
+        console.error(error);
+      }
+    });
+
+    function gerarHorarios() {
+      const horarios = [];
+      for (let h = 7; h <= 17; h++) {
+        for (let m = 0; m < 60; m += 15) {
+          const hora = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+          horarios.push(hora);
+        }
+      }
+      return horarios;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Desabilita botão para evitar múltiplos cliques
+      botaoSubmit.disabled = true;
+
+      // Limpa mensagem anterior
+      mensagemDiv.style.display = 'none';
+      mensagemDiv.textContent = '';
+
+      const body = {
+        nome: form.nome.value,
+        cpf: form.cpf.value,
+        telefone: form.telefone.value,
+        descricao: form.descricao.value,
+        data: form.data.value,
+        hora: form.hora.value,
+        atendimento,
+        posto
+      };
+
+      try {
+        const res = await fetch('http://localhost:3000/agendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const resultado = await res.json();
+        console.log('Resultado do agendamento:', resultado);
+
+        if (resultado.success) {
+          mensagemDiv.style.backgroundColor = '#d4edda';
+          mensagemDiv.style.color = '#155724';
+          mensagemDiv.textContent = 'Agendamento realizado com sucesso! Redirecionando...';
+          mensagemDiv.style.display = 'block';
+
+          console.log("Mensagem exibida. Vai redirecionar em 2 segundos.");
+
+          setTimeout(() => {
+            console.log("Redirecionando para histórico...");
+            window.location.href = `historico.html?cpf=${body.cpf}`;
+          }, 2000);
+
+        } else {
+          mensagemDiv.style.backgroundColor = '#f8d7da';
+          mensagemDiv.style.color = '#721c24';
+          mensagemDiv.textContent = 'Erro: ' + resultado.message;
+          mensagemDiv.style.display = 'block';
+
+          setTimeout(() => {
+            mensagemDiv.style.display = 'none';
+            botaoSubmit.disabled = false;
+          }, 4000);
+        }
+      } catch (error) {
+        mensagemDiv.style.backgroundColor = '#f8d7da';
+        mensagemDiv.style.color = '#721c24';
+        mensagemDiv.textContent = 'Erro ao enviar o agendamento. Tente novamente.';
+        mensagemDiv.style.display = 'block';
+
+        setTimeout(() => {
+          mensagemDiv.style.display = 'none';
+          botaoSubmit.disabled = false;
+        }, 4000);
+        console.error(error);
+      }
+    });
+
+    function voltar() {
+      window.history.back();
+    }
+
+    function inicio() {
+      window.location.href = 'index.html';
+    }
+
+    function historico() {
+      window.location.href = 'historico.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+/* Reset e base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f0f4f8;
+  color: #333;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Container centralizado */
+.container {
+  background-color: white;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+
+.container h1 {
+  margin-bottom: 30px;
+  font-size: 1.4rem;
+  color: #1976d2;
+}
+
+/* Formulário */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+form input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+}
+
+form input:focus {
+  border-color: #1976d2;
+  outline: none;
+  background-color: #fff;
+}
+
+/* Botão de login */
+form button {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #1565c0;
+}
+
+/* Mensagem de erro */
+#erro {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: red;
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .container {
+    padding: 30px 20px;
+  }
+
+  .container h1 {
+    font-size: 1.2rem;
+  }
+
+  form input, form button {
+    font-size: 1rem;
+  }
+}

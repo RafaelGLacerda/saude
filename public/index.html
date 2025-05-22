@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agendamento SUS - Início</title>
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+  <header>
+    <h1>Agendamento de Atendimento - SUS</h1>
+    <nav>
+      <button onclick="irParaHistorico()">Histórico</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Escolha o tipo de atendimento:</h2>
+    <ul id="listaAtendimentos">
+      <!-- Itens serão adicionados dinamicamente -->
+    </ul>
+  </main>
+
+  <script>
+    const atendimentos = [
+      "Consulta Clínica Geral",
+      "Consulta Pediatria",
+      "Consulta Ginecologia",
+      "Exame de Sangue",
+      "Vacinação",
+      "Consulta Odontológica"
+    ];
+
+    const lista = document.getElementById('listaAtendimentos');
+    atendimentos.forEach(tipo => {
+      const li = document.createElement('li');
+      li.textContent = tipo;
+      li.onclick = () => {
+        // Envia o tipo para a próxima página por query param
+        window.location.href = `postos.html?atendimento=${encodeURIComponent(tipo)}`;
+      };
+      lista.appendChild(li);
+    });
+
+    function irParaHistorico() {
+      window.location.href = 'historico.html';
+    }
+  </script>
+</body>
+</html>

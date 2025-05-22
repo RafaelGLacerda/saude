@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel ADM - Agendamentos SUS</title>
+  <link rel="stylesheet" href="css/adm.css" />
+</head>
+<body>
+  <header>
+    <h1>Painel do Funcionário (ADM)</h1>
+    <nav>
+      <button onclick="inicio()">Início</button>
+      <button onclick="logout()">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <label for="filtroPosto">Filtrar por posto de saúde:</label>
+    <select id="filtroPosto" onchange="filtrarAgendamentos()">
+      <option value="todos">Todos os postos</option>
+    </select>
+
+    <section id="listaAgendamentos">
+      <!-- Lista de agendamentos será renderizada aqui -->
+    </section>
+  </main>
+
+  <script>
+    // Proteção de acesso ADM
+    if (localStorage.getItem("admLogado") !== "true") {
+      alert("Acesso restrito. Faça login como funcionário.");
+      window.location.href = "login_adm.html";
+    }
+
+    let todosAgendamentos = [];
+
+    async function carregarAgendamentos() {
+      try {
+        const res = await fetch("http://localhost:3000/agendamentos");
+        todosAgendamentos = await res.json();
+
+        const postosUnicos = [...new Set(todosAgendamentos.map(a => a.posto))];
+        const select = document.getElementById("filtroPosto");
+
+        postosUnicos.forEach(posto => {
+          const option = document.createElement("option");
+          option.value = posto;
+          option.textContent = posto;
+          select.appendChild(option);
+        });
+
+        filtrarAgendamentos();
+      } catch (error) {
+        console.error("Erro ao carregar agendamentos:", error);
+      }
+    }
+
+    function filtrarAgendamentos() {
+      const filtro = document.getElementById("filtroPosto").value;
+      const lista = document.getElementById("listaAgendamentos");
+      lista.innerHTML = "";
+
+      const agendamentosFiltrados = filtro === "todos"
+        ? todosAgendamentos
+        : todosAgendamentos.filter(a => a.posto === filtro);
+
+      if (agendamentosFiltrados.length === 0) {
+        lista.innerHTML = "<p>Nenhum agendamento encontrado.</p>";
+        return;
+      }
+
+      agendamentosFiltrados.forEach(a => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const dataCriado = new Date(a.criadoEm);
+        const dataConsulta = new Date(`${a.data}T${a.hora}`);
+        const status = dataConsulta > new Date() ? "Pendente" : "Realizado";
+
+        card.innerHTML = `
+          <h3>${a.atendimento}</h3>
+          <p><strong>Posto:</strong> ${a.posto}</p>
+          <p><strong>Nome:</strong> ${a.nome}</p>
+          <p><strong>CPF:</strong> ${a.cpf}</p>
+          <p><strong>Telefone:</strong> ${a.telefone}</p>
+          <p><strong>Descrição:</strong> ${a.descricao}</p>
+          <p><strong>Data da Consulta:</strong> ${a.data}</p>
+          <p><strong>Hora:</strong> ${a.hora}</p>
+          <p><strong>Agendado em:</strong> ${dataCriado.toLocaleString()}</p>
+          <p><strong>Status:</strong> ${status}</p>
+        `;
+        lista.appendChild(card);
+      });
+    }
+
+    function inicio() {
+      window.location.href = "index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("admLogado");
+      window.location.href = "login_adm.html";
+    }
+
+    carregarAgendamentos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login ADM</title>
+  <link rel="stylesheet" href="css/login_adm.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Login Funcionário ADM</h1>
+    <form id="formLogin">
+      <input type="text" id="usuario" placeholder="Usuário" required />
+      <input type="password" id="senha" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="erro" style="color: red;"></p>
+  </div>
+
+  <script>
+    const form = document.getElementById("formLogin");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const usuario = document.getElementById("usuario").value;
+      const senha = document.getElementById("senha").value;
+
+      const res = await fetch("http://localhost:3000/loginAdm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user: usuario, pass: senha })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Armazenar sessão simples
+        localStorage.setItem("admLogado", "true");
+        window.location.href = "adm.html";
+      } else {
+        document.getElementById("erro").textContent = data.erro;
+      }
+    });
+  </script>
+</body>
+</html>
