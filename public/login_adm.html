@@ -26,7 +26,7 @@
       const usuario = document.getElementById("usuario").value;
       const senha = document.getElementById("senha").value;
 
-      const res = await fetch("http://localhost:3000/loginAdm", {
+      const res = await fetch("https://agendamentosus.onrender.com/loginAdm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user: usuario, pass: senha })

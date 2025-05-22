@@ -129,7 +129,7 @@
     }
 
     function carregarAgendamentos(cpf) {
-      fetch('http://localhost:3000/agendamentos')
+      fetch('https://agendamentosus.onrender.com/agendamentos')
         .then(res => res.json())
         .then(data => {
           const agendamentos = data.filter(a => a.cpf === cpf);

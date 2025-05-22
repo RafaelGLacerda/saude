@@ -37,7 +37,7 @@
 
     async function carregarAgendamentos() {
       try {
-        const res = await fetch("http://localhost:3000/agendamentos");
+        const res = await fetch("https://agendamentosus.onrender.com/agendamentos");
         todosAgendamentos = await res.json();
 
         const postosUnicos = [...new Set(todosAgendamentos.map(a => a.posto))];
