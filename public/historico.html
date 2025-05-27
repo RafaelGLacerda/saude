@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-   <link rel="icon" href="css/download.svg" type="image/svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="css/download.svg" type="image/svg">
   <title>Histórico de Agendamentos</title>
   <link rel="stylesheet" href="css/historico.css" />
   <style>
@@ -27,7 +28,7 @@
       border-radius: 8px;
       text-align: center;
       max-width: 320px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
       width: 90%;
     }
 
@@ -68,6 +69,7 @@
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Histórico de Agendamentos</h1>
@@ -96,27 +98,27 @@
 
   <button id="suporteBtn">Suporte</button>
 
-<div id="suporteForm">
-  <form action="https://formsubmit.co/nosenselolclips@gmail.com" method="POST">
-    <input type="hidden" name="_next" value="">
-    <label>Email:
-      <input type="email" name="email" required>
-    </label><br>
-    <label>Mensagem:
-      <textarea name="mensagem" required></textarea>
-    </label><br>
-    <button type="submit">Enviar</button>
-  </form>
-</div>
+  <div id="suporteForm">
+    <form action="https://formsubmit.co/nosenselolclips@gmail.com" method="POST">
+      <input type="hidden" name="_next" value="">
+      <label>Email:
+        <input type="email" name="email" required>
+      </label><br>
+      <label>Mensagem:
+        <textarea name="mensagem" required></textarea>
+      </label><br>
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
 
   <script>
-         const btn = document.getElementById('suporteBtn');
-  const form = document.getElementById('suporteForm');
+    const btn = document.getElementById('suporteBtn');
+    const form = document.getElementById('suporteForm');
 
-  btn.onclick = () => {
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    form.querySelector('input[name="_next"]').value = window.location.href;
-  };
+    btn.onclick = () => {
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      form.querySelector('input[name="_next"]').value = window.location.href;
+    };
 
     const params = new URLSearchParams(window.location.search);
     let cpf = params.get('cpf');
@@ -175,11 +177,11 @@
             const dataCriado = new Date(a.criadoEm);
             const hoje = new Date();
             let status = 'Desconhecido';
-if (a.status === 'Concluído' || a.status === 'Não Compareceu') {
-  status = a.status;
-} else {
-  status = dataHoraConsulta > hoje ? 'Pendente' : 'Realizado';
-}
+            if (a.status === 'Concluído' || a.status === 'Não Compareceu') {
+              status = a.status;
+            } else {
+              status = dataHoraConsulta > hoje ? 'Pendente' : 'Realizado';
+            }
 
 
             card.innerHTML = `
@@ -209,4 +211,5 @@ if (a.status === 'Concluído' || a.status === 'Não Compareceu') {
     }
   </script>
 </body>
+
 </html>

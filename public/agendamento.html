@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-   <link rel="icon" href="css/download.svg" type="image/svg">
-  <link rel="stylesheet" href="download.png">
-  <title>Agendamento</title>
+  <link rel="icon" href="css/download.svg" type="image/svg" />
   <link rel="stylesheet" href="css/agendamento.css" />
+  <title>Agendamento</title>
   <style>
     #mensagemAgendamento {
       display: none;
@@ -37,7 +36,7 @@
       </label>
 
       <label>CPF:
-        <input type="text" name="cpf" required />
+        <input type="text" name="cpf" id="cpf" maxlength="14" required />
       </label>
 
       <label>Telefone:
@@ -64,30 +63,49 @@
 
   <button id="suporteBtn">Suporte</button>
 
-<div id="suporteForm">
-  <form action="https://formsubmit.co/nosenselolclips@gmail.com" method="POST">
-    <input type="hidden" name="_next" value="">
-    <label>Email:
-      <input type="email" name="email" required>
-    </label><br>
-    <label>Mensagem:
-      <textarea name="mensagem" required></textarea>
-    </label><br>
-    <button type="submit">Enviar</button>
-  </form>
-</div>
+  <div id="suporteForm" style="display:none;">
+    <form action="https://formsubmit.co/nosenselolclips@gmail.com" method="POST">
+      <input type="hidden" name="_next" value="" />
+      <label>Email:
+        <input type="email" name="email" required />
+      </label><br />
+      <label>Mensagem:
+        <textarea name="mensagem" required></textarea>
+      </label><br />
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
 
   <script>
-    
- const suporteBtn = document.getElementById('suporteBtn');
-const formSuporte = document.getElementById('suporteForm');
+    // Máscara CPF
+    const cpfInput = document.getElementById('cpf');
+    cpfInput.addEventListener('input', (e) => {
+      let v = e.target.value;
+      v = v.replace(/\D/g, ''); // Remove tudo que não for dígito
+      v = v.slice(0, 11);       // Limita a 11 dígitos
 
-suporteBtn.onclick = () => {
-  formSuporte.style.display = formSuporte.style.display === 'none' ? 'block' : 'none';
-  formSuporte.querySelector('input[name="_next"]').value = window.location.href;
-};
+      // Formata CPF: 000.000.000-00
+      if (v.length > 9) {
+        v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+      } else if (v.length > 6) {
+        v = v.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+      } else if (v.length > 3) {
+        v = v.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+      }
 
+      e.target.value = v;
+    });
 
+    // Toggle Suporte
+    const suporteBtn = document.getElementById('suporteBtn');
+    const formSuporte = document.getElementById('suporteForm');
+
+    suporteBtn.onclick = () => {
+      formSuporte.style.display = formSuporte.style.display === 'none' ? 'block' : 'none';
+      formSuporte.querySelector('input[name="_next"]').value = window.location.href;
+    };
+
+    // Parâmetros URL
     const params = new URLSearchParams(window.location.search);
     const atendimento = params.get('atendimento');
     const posto = params.get('posto');
@@ -114,7 +132,6 @@ suporteBtn.onclick = () => {
       return `${ano}-${mes}-${dia}`;
     }
 
-    // Define o mínimo como hoje e seta valor inicial
     dataInput.min = formatarDataHoje();
     dataInput.value = formatarDataHoje();
 
@@ -178,10 +195,7 @@ suporteBtn.onclick = () => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Desabilita botão para evitar múltiplos cliques
       botaoSubmit.disabled = true;
-
-      // Limpa mensagem anterior
       mensagemDiv.style.display = 'none';
       mensagemDiv.textContent = '';
 
@@ -195,33 +209,34 @@ suporteBtn.onclick = () => {
         atendimento,
         posto
       };
-const resAg = await fetch('https://agendamentosus.onrender.com/agendamentos');
-const agendamentosUsuario = (await resAg.json()).filter(a => a.cpf === body.cpf);
-
-const pendentes = agendamentosUsuario.filter(a => {
-  const agData = new Date(`${a.data}T${a.hora}`);
-  return agData > new Date();
-});
-
-if (pendentes.length >= 1000000) {
-    mensagemDiv.style.backgroundColor = '#f8d7da';
-  mensagemDiv.style.color = '#721c24';
-  mensagemDiv.textContent = 'Você já possui 2 agendamentos pendentes. Aguarde a realização de um deles para agendar novamente.';
-  mensagemDiv.style.display = 'block';
-  botaoSubmit.disabled = false;
-  return;
-}
-
-if (agendamentosUsuario.length >= 1000000) {
-   mensagemDiv.style.backgroundColor = '#f8d7da';
-  mensagemDiv.style.color = '#721c24';
-  mensagemDiv.textContent = 'Limite de 2 agendamentos por CPF atingido.';
-  mensagemDiv.style.display = 'block';
-  botaoSubmit.disabled = false;
-  return;
-}
 
       try {
+        const resAg = await fetch('https://agendamentosus.onrender.com/agendamentos');
+        const agendamentosUsuario = (await resAg.json()).filter(a => a.cpf === body.cpf);
+
+        const pendentes = agendamentosUsuario.filter(a => {
+          const agData = new Date(`${a.data}T${a.hora}`);
+          return agData > new Date();
+        });
+
+        if (pendentes.length >= 2) {
+          mensagemDiv.style.backgroundColor = '#f8d7da';
+          mensagemDiv.style.color = '#721c24';
+          mensagemDiv.textContent = 'Você já possui 2 agendamentos pendentes. Aguarde a realização de um deles para agendar novamente.';
+          mensagemDiv.style.display = 'block';
+          botaoSubmit.disabled = false;
+          return;
+        }
+
+        if (agendamentosUsuario.length >= 2) {
+          mensagemDiv.style.backgroundColor = '#f8d7da';
+          mensagemDiv.style.color = '#721c24';
+          mensagemDiv.textContent = 'Limite de 2 agendamentos por CPF atingido.';
+          mensagemDiv.style.display = 'block';
+          botaoSubmit.disabled = false;
+          return;
+        }
+
         const res = await fetch('https://agendamentosus.onrender.com/agendar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -229,7 +244,6 @@ if (agendamentosUsuario.length >= 1000000) {
         });
 
         const resultado = await res.json();
-        console.log('Resultado do agendamento:', resultado);
 
         if (resultado.success) {
           mensagemDiv.style.backgroundColor = '#d4edda';
@@ -237,10 +251,7 @@ if (agendamentosUsuario.length >= 1000000) {
           mensagemDiv.textContent = 'Agendamento realizado com sucesso! Redirecionando...';
           mensagemDiv.style.display = 'block';
 
-          console.log("Mensagem exibida. Vai redirecionar em 2 segundos.");
-
           setTimeout(() => {
-            console.log("Redirecionando para histórico...");
             window.location.href = `historico.html?cpf=${body.cpf}`;
           }, 2000);
 
