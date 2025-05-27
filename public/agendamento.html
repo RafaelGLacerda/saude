@@ -204,16 +204,16 @@ const pendentes = agendamentosUsuario.filter(a => {
 });
 
 if (pendentes.length >= 2) {
-  mensagemDiv.style.backgroundColor = '#f8d7da';
+    mensagemDiv.style.backgroundColor = '#f8d7da';
   mensagemDiv.style.color = '#721c24';
-  mensagemDiv.textContent = 'Você já possui um agendamento pendente. Aguarde a realização antes de agendar outro.';
+  mensagemDiv.textContent = 'Você já possui 2 agendamentos pendentes. Aguarde a realização de um deles para agendar novamente.';
   mensagemDiv.style.display = 'block';
   botaoSubmit.disabled = false;
   return;
 }
 
 if (agendamentosUsuario.length >= 2) {
-  mensagemDiv.style.backgroundColor = '#f8d7da';
+   mensagemDiv.style.backgroundColor = '#f8d7da';
   mensagemDiv.style.color = '#721c24';
   mensagemDiv.textContent = 'Limite de 2 agendamentos por CPF atingido.';
   mensagemDiv.style.display = 'block';

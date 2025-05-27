@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-   <link rel="icon" href="css/download.svg" type="image/svg">
+  <link rel="icon" href="css/download.svg" type="image/svg">
   <title>Painel ADM - Agendamentos SUS</title>
   <link rel="stylesheet" href="css/adm.css" />
 </head>
@@ -35,24 +35,80 @@
     }
 
     let todosAgendamentos = [];
-async function atualizarStatus(id, novoStatus) {
-  try {
-    const res = await fetch(`https://agendamentosus.onrender.com/agendamentos/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: novoStatus })
-    });
-    if (res.ok) {
-      alert("Status atualizado com sucesso.");
-      carregarAgendamentos();
-    } else {
-      alert("Erro ao atualizar status.");
+
+    window.marcarStatus = async function (botaoClicado, id, novoStatus) {
+      try {
+        const res = await fetch(`https://agendamentosus.onrender.com/agendamentos/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: novoStatus })
+        });
+
+        if (res.ok) {
+          botaoClicado.disabled = true;
+          botaoClicado.nextElementSibling?.disabled = true;
+          botaoClicado.previousElementSibling?.disabled = true;
+          botaoClicado.classList.add("clicado");
+          alert("Status atualizado com sucesso.");
+        } else {
+          alert("Erro ao atualizar status.");
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Erro na atualização.");
+      }
+    };
+
+    window.inicio = function () {
+      window.location.href = "index.html";
+    };
+
+    window.logout = function () {
+      localStorage.removeItem("admLogado");
+      window.location.href = "login_adm.html";
+    };
+
+    function filtrarAgendamentos() {
+      const filtro = document.getElementById("filtroPosto").value;
+      const lista = document.getElementById("listaAgendamentos");
+      lista.innerHTML = "";
+
+      const agendamentosFiltrados = filtro === "todos"
+        ? todosAgendamentos
+        : todosAgendamentos.filter(a => a.posto === filtro);
+
+      if (agendamentosFiltrados.length === 0) {
+        lista.innerHTML = "<p>Nenhum agendamento encontrado.</p>";
+        return;
+      }
+
+      agendamentosFiltrados.forEach((a) => {
+        const agendamentoId = a._id;
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const dataCriado = new Date(a.criadoEm);
+        const dataConsulta = new Date(`${a.data}T${a.hora}`);
+        const status = dataConsulta > new Date() ? "Pendente" : "Realizado";
+
+        card.innerHTML = `
+          <h3>${a.atendimento}</h3>
+          <p><strong>Posto:</strong> ${a.posto}</p>
+          <p><strong>Nome:</strong> ${a.nome}</p>
+          <p><strong>CPF:</strong> ${a.cpf}</p>
+          <p><strong>Telefone:</strong> ${a.telefone}</p>
+          <p><strong>Descrição:</strong> ${a.descricao}</p>
+          <p><strong>Data da Consulta:</strong> ${dataConsulta.toLocaleDateString('pt-BR')}</p>
+          <p><strong>Hora:</strong> ${a.hora}</p>
+          <p><strong>Status:</strong> ${status}</p>
+          <p><strong>Agendado em:</strong> ${dataCriado.toLocaleString('pt-BR')}</p>
+          <button onclick="marcarStatus(this, '${agendamentoId}', 'concluido')">Concluído</button>
+          <button onclick="marcarStatus(this, '${agendamentoId}', 'nao_compareceu')">Não Compareceu</button>
+        `;
+
+        lista.appendChild(card);
+      });
     }
-  } catch (e) {
-    console.error(e);
-    alert("Erro na atualização.");
-  }
-}
 
     async function carregarAgendamentos() {
       try {
@@ -75,58 +131,7 @@ async function atualizarStatus(id, novoStatus) {
       }
     }
 
-    function filtrarAgendamentos() {
-      const filtro = document.getElementById("filtroPosto").value;
-      const lista = document.getElementById("listaAgendamentos");
-      lista.innerHTML = "";
-
-      const agendamentosFiltrados = filtro === "todos"
-        ? todosAgendamentos
-        : todosAgendamentos.filter(a => a.posto === filtro);
-
-      if (agendamentosFiltrados.length === 0) {
-        lista.innerHTML = "<p>Nenhum agendamento encontrado.</p>";
-        return;
-      }
-
-      agendamentosFiltrados.forEach((a, index) => {
-  const agendamentoId = `${index}-${a.cpf}-${a.hora}`;
-
-        const card = document.createElement("div");
-        card.classList.add("card");
-
-        const dataCriado = new Date(a.criadoEm);
-        const dataConsulta = new Date(`${a.data}T${a.hora}`);
-        const status = dataConsulta > new Date() ? "Pendente" : "Realizado";
-
-        card.innerHTML = `
-  <h3>${a.atendimento}</h3>
-  <p><strong>Posto:</strong> ${a.posto}</p>
-  <p><strong>Nome:</strong> ${a.nome}</p>
-  <p><strong>CPF:</strong> ${a.cpf}</p>
-  <p><strong>Telefone:</strong> ${a.telefone}</p>
-  <p><strong>Descrição:</strong> ${a.descricao}</p>
-  <p><strong>Data da Consulta:</strong> ${a.data}</p>
-  <p><strong>Hora:</strong> ${a.hora}</p>
-  <p><strong>Status:</strong> ${status}</p>
-  <p><strong>Agendado em:</strong> ${dataCriado.toLocaleString()}</p>
-  <button onclick="atualizarStatus('${agendamentoId}', 'concluido')">Concluído</button>
-<button onclick="atualizarStatus('${agendamentoId}', 'nao_compareceu')">Não Compareceu</button>
-`;
-
-        lista.appendChild(card);
-      });
-    }
-
-    function inicio() {
-      window.location.href = "index.html";
-    }
-
-    function logout() {
-      localStorage.removeItem("admLogado");
-      window.location.href = "login_adm.html";
-    }
-
+    // Chamada final
     carregarAgendamentos();
   </script>
 </body>

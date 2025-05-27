@@ -189,10 +189,10 @@ if (a.status === 'Concluído' || a.status === 'Não Compareceu') {
               <p><strong>CPF:</strong> ${a.cpf}</p>
               <p><strong>Telefone:</strong> ${a.telefone}</p>
               <p><strong>Descrição:</strong> ${a.descricao}</p>
-              <p><strong>Data:</strong> ${a.data}</p>
+              <p><strong>Data:</strong> ${dataHoraConsulta.toLocaleDateString('pt-BR')}</p>
               <p><strong>Hora:</strong> ${a.hora}</p>
               <p><strong>Status:</strong> ${status}</p>
-              <p><strong>Agendado em:</strong> ${dataCriado.toLocaleString()}</p>
+              <p><strong>Agendado em:</strong> ${dataCriado.toLocaleString('pt-BR')}</p>
               <p style="color: green; font-weight: bold;">Comparecer entre 15 a 30 minutos antes do horário agendado.</p>
             `;
             section.appendChild(card);
