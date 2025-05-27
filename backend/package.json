@@ -1,7 +1,7 @@
 {
   "name": "SUS",
   "version": "1.0.0",
-  "description": "Servidor Node.js para o projeto ReciclaSalvador",
+  "description": "",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -9,9 +9,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "uuid": "^11.1.0"
   }
 }
