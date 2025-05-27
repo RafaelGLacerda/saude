@@ -34,9 +34,10 @@
       window.location.href = "login_adm.html";
     }
 
-    let todosAgendamentos = [];
+   let todosAgendamentos = [];
 
-    window.marcarStatus = async function (botaoClicado, id, novoStatus) {
+window.marcarStatus = async function (botaoClicado, id, novoStatus) {
+  
       try {
         const res = await fetch(`https://agendamentosus.onrender.com/agendamentos/${id}`, {
           method: 'PUT',
@@ -68,47 +69,51 @@
       window.location.href = "login_adm.html";
     };
 
-    function filtrarAgendamentos() {
-      const filtro = document.getElementById("filtroPosto").value;
-      const lista = document.getElementById("listaAgendamentos");
-      lista.innerHTML = "";
+   function filtrarAgendamentos() {
+  const filtro = document.getElementById("filtroPosto").value;
+  const lista = document.getElementById("listaAgendamentos");
+  lista.innerHTML = "";
 
-      const agendamentosFiltrados = filtro === "todos"
-        ? todosAgendamentos
-        : todosAgendamentos.filter(a => a.posto === filtro);
+  const agendamentosFiltrados = filtro === "todos"
+    ? todosAgendamentos
+    : todosAgendamentos.filter(a => a.posto === filtro);
 
-      if (agendamentosFiltrados.length === 0) {
-        lista.innerHTML = "<p>Nenhum agendamento encontrado.</p>";
-        return;
-      }
+  if (agendamentosFiltrados.length === 0) {
+    lista.innerHTML = "<p>Nenhum agendamento encontrado.</p>";
+    return;
+  }
 
-      agendamentosFiltrados.forEach((a) => {
-        const agendamentoId = a._id;
-        const card = document.createElement("div");
-        card.classList.add("card");
+  agendamentosFiltrados.forEach((a) => {
+    const agendamentoId = a.id || `${a.cpf}-${a.data}-${a.hora}`;
 
-        const dataCriado = new Date(a.criadoEm);
-        const dataConsulta = new Date(`${a.data}T${a.hora}`);
-        const status = dataConsulta > new Date() ? "Pendente" : "Realizado";
+    const card = document.createElement("div");
+    card.classList.add("card");
 
-        card.innerHTML = `
-          <h3>${a.atendimento}</h3>
-          <p><strong>Posto:</strong> ${a.posto}</p>
-          <p><strong>Nome:</strong> ${a.nome}</p>
-          <p><strong>CPF:</strong> ${a.cpf}</p>
-          <p><strong>Telefone:</strong> ${a.telefone}</p>
-          <p><strong>Descrição:</strong> ${a.descricao}</p>
-          <p><strong>Data da Consulta:</strong> ${dataConsulta.toLocaleDateString('pt-BR')}</p>
-          <p><strong>Hora:</strong> ${a.hora}</p>
-          <p><strong>Status:</strong> ${status}</p>
-          <p><strong>Agendado em:</strong> ${dataCriado.toLocaleString('pt-BR')}</p>
-          <button onclick="marcarStatus(this, '${agendamentoId}', 'concluido')">Concluído</button>
-          <button onclick="marcarStatus(this, '${agendamentoId}', 'nao_compareceu')">Não Compareceu</button>
-        `;
+    const dataCriado = new Date(a.criadoEm);
+    const dataConsulta = new Date(`${a.data}T${a.hora}`);
 
-        lista.appendChild(card);
-      });
-    }
+    // Mostrar status salvo no backend:
+    const status = a.status;
+
+    card.innerHTML = `
+      <h3>${a.atendimento}</h3>
+      <p><strong>Posto:</strong> ${a.posto}</p>
+      <p><strong>Nome:</strong> ${a.nome}</p>
+      <p><strong>CPF:</strong> ${a.cpf}</p>
+      <p><strong>Telefone:</strong> ${a.telefone}</p>
+      <p><strong>Descrição:</strong> ${a.descricao}</p>
+      <p><strong>Data da Consulta:</strong> ${dataConsulta.toLocaleDateString('pt-BR')}</p>
+      <p><strong>Hora:</strong> ${a.hora}</p>
+      <p><strong>Status:</strong> ${status}</p>
+      <p><strong>Agendado em:</strong> ${dataCriado.toLocaleString('pt-BR')}</p>
+      <button onclick="marcarStatus(this, '${agendamentoId}', 'concluido')">Concluído</button>
+      <button onclick="marcarStatus(this, '${agendamentoId}', 'nao_compareceu')">Não Compareceu</button>
+    `;
+
+    lista.appendChild(card);
+  });
+}
+
 
     async function carregarAgendamentos() {
       try {

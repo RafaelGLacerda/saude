@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid'); // Para gerar IDs únicos
 
 const app = express();
 app.use(cors());
@@ -82,6 +83,7 @@ app.post('/agendar', (req, res) => {
   }
 
   const agendamento = {
+    id: `${cpf}-${data}-${hora}`,
     nome,
     cpf,
     telefone,
@@ -104,6 +106,7 @@ app.post('/agendar', (req, res) => {
 app.get('/', (req, res) => {
   res.send('API de Agendamento do SUS está ativa!');
 });
+
 // 🛠 Atualizar status do agendamento (Concluído ou Não Compareceu)
 app.put('/agendamentos/:id', (req, res) => {
   const { id } = req.params;
@@ -114,11 +117,7 @@ app.put('/agendamentos/:id', (req, res) => {
   }
 
   const dados = lerDados();
-  const agendamento = dados.agendamentos.find((a, i) => {
-    // Simular ID como índice+cpf+hora para identificar
-    const agId = `${i}-${a.cpf}-${a.hora}`;
-    return agId === id;
-  });
+  const agendamento = dados.agendamentos.find(a => a.id === id);
 
   if (!agendamento) {
     return res.status(404).json({ success: false, message: 'Agendamento não encontrado.' });
