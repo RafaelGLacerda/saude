@@ -2,8 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" href="css/download.svg" type="image/svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Painel ADM - Agendamentos SUS</title>
   <link rel="stylesheet" href="css/adm.css" />
 </head>
@@ -11,14 +10,14 @@
   <header>
     <h1>Painel do Funcionário (ADM)</h1>
     <nav>
-      <button onclick="inicio()">Início</button>
-      <button onclick="logout()">Sair</button>
+      <button id="btnInicio">Início</button>
+      <button id="btnLogout">Sair</button>
     </nav>
   </header>
 
   <main>
     <label for="filtroPosto">Filtrar por posto de saúde:</label>
-    <select id="filtroPosto" onchange="filtrarAgendamentos()">
+    <select id="filtroPosto">
       <option value="todos">Todos os postos</option>
     </select>
 
@@ -28,55 +27,64 @@
   </main>
 
   <script>
-    // Proteção de acesso ADM
+    // --- Proteção de acesso ADM ---
     if (localStorage.getItem("admLogado") !== "true") {
       alert("Acesso restrito. Faça login como funcionário.");
       window.location.href = "login_adm.html";
     }
 
-   let todosAgendamentos = [];
+    const API_BASE = "https://agendamentosus.onrender.com";
 
-window.marcarStatus = async function (botaoClicado, id, novoStatus) {
-  
-      try {
-        const res = await fetch(`https://agendamentosus.onrender.com/agendamentos/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: novoStatus })
-        });
+    let todosAgendamentos = [];
 
-        if (res.ok) {
-          botaoClicado.disabled = true;
-          botaoClicado.nextElementSibling?.disabled = true;
-          botaoClicado.previousElementSibling?.disabled = true;
-          botaoClicado.classList.add("clicado");
-          alert("Status atualizado com sucesso.");
-        } else {
-          alert("Erro ao atualizar status.");
-        }
-      } catch (e) {
-        console.error(e);
-        alert("Erro na atualização.");
-      }
-    };
+    // Atualiza status do agendamento (concluído ou não compareceu)
+async function marcarStatus(botao, id, novoStatus) {
+  const card = botao.parentElement;
+  const botoes = card.querySelectorAll("button");
+  botoes.forEach(b => b.disabled = true); // desabilita os dois botões
 
-    window.inicio = function () {
-      window.location.href = "index.html";
-    };
+  const msgStatus = card.querySelector(".msg-status");
+  msgStatus.textContent = "Atualizando status...";
+  msgStatus.style.color = "blue";
 
-    window.logout = function () {
-      localStorage.removeItem("admLogado");
-      window.location.href = "login_adm.html";
-    };
+  try {
+    const res = await fetch(`${API_BASE}/agendamentos/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: novoStatus }),
+    });
 
-   function filtrarAgendamentos() {
+    if (!res.ok) {
+      throw new Error("Falha ao atualizar status");
+    }
+
+    // Atualiza status no array local e na interface
+    const index = todosAgendamentos.findIndex((a) => a.id === id);
+    if (index >= 0) {
+      todosAgendamentos[index].status = novoStatus === "concluido" ? "Concluído" : "Não Compareceu";
+      renderAgendamentos();
+    }
+
+    // Mensagem de sucesso - reexibe depois que renderiza novamente
+    // Para garantir, podemos mostrar após renderização, mas aqui já temos renderAgendamentos que limpa tudo,
+    // então a mensagem será zerada - então melhor colocar no render depois.
+  } catch (err) {
+    msgStatus.textContent = "Erro ao atualizar status: " + err.message;
+    msgStatus.style.color = "red";
+    botoes.forEach(b => b.disabled = false); // reabilita em caso de erro
+  }
+}
+
+// Na renderização, acrescente abaixo dos botões um espaço para mensagens:
+function renderAgendamentos() {
   const filtro = document.getElementById("filtroPosto").value;
   const lista = document.getElementById("listaAgendamentos");
   lista.innerHTML = "";
 
-  const agendamentosFiltrados = filtro === "todos"
-    ? todosAgendamentos
-    : todosAgendamentos.filter(a => a.posto === filtro);
+  const agendamentosFiltrados =
+    filtro === "todos"
+      ? todosAgendamentos
+      : todosAgendamentos.filter((a) => a.posto === filtro);
 
   if (agendamentosFiltrados.length === 0) {
     lista.innerHTML = "<p>Nenhum agendamento encontrado.</p>";
@@ -84,16 +92,11 @@ window.marcarStatus = async function (botaoClicado, id, novoStatus) {
   }
 
   agendamentosFiltrados.forEach((a) => {
-    const agendamentoId = a.id || `${a.cpf}-${a.data}-${a.hora}`;
-
     const card = document.createElement("div");
     card.classList.add("card");
 
     const dataCriado = new Date(a.criadoEm);
     const dataConsulta = new Date(`${a.data}T${a.hora}`);
-
-    // Mostrar status salvo no backend:
-    const status = a.status;
 
     card.innerHTML = `
       <h3>${a.atendimento}</h3>
@@ -102,12 +105,13 @@ window.marcarStatus = async function (botaoClicado, id, novoStatus) {
       <p><strong>CPF:</strong> ${a.cpf}</p>
       <p><strong>Telefone:</strong> ${a.telefone}</p>
       <p><strong>Descrição:</strong> ${a.descricao}</p>
-      <p><strong>Data da Consulta:</strong> ${dataConsulta.toLocaleDateString('pt-BR')}</p>
+      <p><strong>Data da Consulta:</strong> ${dataConsulta.toLocaleDateString("pt-BR")}</p>
       <p><strong>Hora:</strong> ${a.hora}</p>
-      <p><strong>Status:</strong> ${status}</p>
-      <p><strong>Agendado em:</strong> ${dataCriado.toLocaleString('pt-BR')}</p>
-      <button onclick="marcarStatus(this, '${agendamentoId}', 'concluido')">Concluído</button>
-      <button onclick="marcarStatus(this, '${agendamentoId}', 'nao_compareceu')">Não Compareceu</button>
+      <p><strong>Status:</strong> ${a.status}</p>
+      <p><strong>Agendado em:</strong> ${dataCriado.toLocaleString("pt-BR")}</p>
+      <button ${a.status === "Concluído" ? "disabled" : ""} onclick="marcarStatus(this, '${a.id}', 'concluido')">Concluído</button>
+      <button ${a.status === "Não Compareceu" ? "disabled" : ""} onclick="marcarStatus(this, '${a.id}', 'nao_compareceu')">Não Compareceu</button>
+      <div class="msg-status" style="margin-top:8px; font-weight:bold;"></div>
     `;
 
     lista.appendChild(card);
@@ -115,28 +119,48 @@ window.marcarStatus = async function (botaoClicado, id, novoStatus) {
 }
 
 
+    // Carrega os agendamentos do backend e popula filtro
     async function carregarAgendamentos() {
       try {
-        const res = await fetch("https://agendamentosus.onrender.com/agendamentos");
+        const res = await fetch(`${API_BASE}/agendamentos`);
+        if (!res.ok) throw new Error("Falha ao buscar agendamentos");
         todosAgendamentos = await res.json();
 
-        const postosUnicos = [...new Set(todosAgendamentos.map(a => a.posto))];
+        // Gera opções únicas de postos para filtro
+        const postosUnicos = [...new Set(todosAgendamentos.map((a) => a.posto))];
         const select = document.getElementById("filtroPosto");
 
-        postosUnicos.forEach(posto => {
+        // Remove todas opções exceto "todos"
+        select.querySelectorAll("option:not([value='todos'])").forEach(opt => opt.remove());
+
+        postosUnicos.forEach((posto) => {
           const option = document.createElement("option");
           option.value = posto;
           option.textContent = posto;
           select.appendChild(option);
         });
 
-        filtrarAgendamentos();
-      } catch (error) {
-        console.error("Erro ao carregar agendamentos:", error);
+        renderAgendamentos();
+      } catch (err) {
+        console.error("Erro ao carregar agendamentos:", err);
+        document.getElementById("listaAgendamentos").innerHTML = "<p>Erro ao carregar agendamentos.</p>";
       }
     }
 
-    // Chamada final
+    // Evento para filtrar ao mudar o select
+    document.getElementById("filtroPosto").addEventListener("change", renderAgendamentos);
+
+    // Navegação
+    document.getElementById("btnInicio").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      localStorage.removeItem("admLogado");
+      window.location.href = "login_adm.html";
+    });
+
+    // Carrega tudo no início
     carregarAgendamentos();
   </script>
 </body>

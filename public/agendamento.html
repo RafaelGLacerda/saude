@@ -203,7 +203,7 @@ const pendentes = agendamentosUsuario.filter(a => {
   return agData > new Date();
 });
 
-if (pendentes.length >= 2) {
+if (pendentes.length >= 1000000) {
     mensagemDiv.style.backgroundColor = '#f8d7da';
   mensagemDiv.style.color = '#721c24';
   mensagemDiv.textContent = 'Você já possui 2 agendamentos pendentes. Aguarde a realização de um deles para agendar novamente.';
@@ -212,7 +212,7 @@ if (pendentes.length >= 2) {
   return;
 }
 
-if (agendamentosUsuario.length >= 2) {
+if (agendamentosUsuario.length >= 1000000) {
    mensagemDiv.style.backgroundColor = '#f8d7da';
   mensagemDiv.style.color = '#721c24';
   mensagemDiv.textContent = 'Limite de 2 agendamentos por CPF atingido.';
