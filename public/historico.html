@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <link rel="icon" href="css/download.svg" type="image/svg">
   <title>Histórico de Agendamentos</title>
   <link rel="stylesheet" href="css/historico.css" />
   <style>
@@ -93,7 +94,30 @@
     </div>
   </div>
 
+  <button id="suporteBtn">Suporte</button>
+
+<div id="suporteForm">
+  <form action="https://formsubmit.co/nosenselolclips@gmail.com" method="POST">
+    <input type="hidden" name="_next" value="">
+    <label>Email:
+      <input type="email" name="email" required>
+    </label><br>
+    <label>Mensagem:
+      <textarea name="mensagem" required></textarea>
+    </label><br>
+    <button type="submit">Enviar</button>
+  </form>
+</div>
+
   <script>
+         const btn = document.getElementById('suporteBtn');
+  const form = document.getElementById('suporteForm');
+
+  btn.onclick = () => {
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    form.querySelector('input[name="_next"]').value = window.location.href;
+  };
+
     const params = new URLSearchParams(window.location.search);
     let cpf = params.get('cpf');
 
@@ -150,7 +174,13 @@
             const dataHoraConsulta = new Date(`${a.data}T${a.hora}`);
             const dataCriado = new Date(a.criadoEm);
             const hoje = new Date();
-            const status = dataHoraConsulta > hoje ? 'Pendente' : 'Realizado';
+            let status = 'Desconhecido';
+if (a.status === 'Concluído' || a.status === 'Não Compareceu') {
+  status = a.status;
+} else {
+  status = dataHoraConsulta > hoje ? 'Pendente' : 'Realizado';
+}
+
 
             card.innerHTML = `
               <h3>${a.atendimento}</h3>

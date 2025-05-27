@@ -103,6 +103,31 @@ app.post('/agendar', (req, res) => {
 app.get('/', (req, res) => {
   res.send('API de Agendamento do SUS está ativa!');
 });
+// 🛠 Atualizar status do agendamento (Concluído ou Não Compareceu)
+app.put('/agendamentos/:id', (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status || !['concluido', 'nao_compareceu'].includes(status)) {
+    return res.status(400).json({ success: false, message: 'Status inválido.' });
+  }
+
+  const dados = lerDados();
+  const agendamento = dados.agendamentos.find((a, i) => {
+    // Simular ID como índice+cpf+hora para identificar
+    const agId = `${i}-${a.cpf}-${a.hora}`;
+    return agId === id;
+  });
+
+  if (!agendamento) {
+    return res.status(404).json({ success: false, message: 'Agendamento não encontrado.' });
+  }
+
+  agendamento.status = status === 'concluido' ? 'Concluído' : 'Não Compareceu';
+  salvarDados(dados);
+
+  res.json({ success: true, agendamento });
+});
 
 // Porta adaptável ao Render
 const PORT = process.env.PORT || 3000;

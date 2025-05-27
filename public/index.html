@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Agendamento SUS - Início</title>
+   <link rel="icon" href="css/download.svg" type="image/svg">
+  <title>Tipo de Consulta</title>
   <link rel="stylesheet" href="css/index.css">
+   
 </head>
 <body>
   <header>
-    <h1>Agendamento de Atendimento - SUS</h1>
+    <h1>Tipo de Consulta</h1>
     <nav>
       <button onclick="irParaHistorico()">Histórico</button>
     </nav>
@@ -21,7 +23,31 @@
     </ul>
   </main>
 
+
+<button id="suporteBtn">Suporte</button>
+
+<div id="suporteForm">
+  <form action="https://formsubmit.co/nosenselolclips@gmail.com" method="POST">
+    <input type="hidden" name="_next" value="">
+    <label>Email:
+      <input type="email" name="email" required>
+    </label><br>
+    <label>Mensagem:
+      <textarea name="mensagem" required></textarea>
+    </label><br>
+    <button type="submit">Enviar</button>
+  </form>
+</div>
+
   <script>
+      const btn = document.getElementById('suporteBtn');
+  const form = document.getElementById('suporteForm');
+
+  btn.onclick = () => {
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    form.querySelector('input[name="_next"]').value = window.location.href;
+  };
+
     const atendimentos = [
       "Consulta Clínica Geral",
       "Consulta Pediatria",

@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <link rel="icon" href="css/download.svg" type="image/svg">
+  <link rel="stylesheet" href="download.png">
   <title>Agendamento</title>
   <link rel="stylesheet" href="css/agendamento.css" />
   <style>
@@ -60,7 +62,32 @@
     </form>
   </main>
 
+  <button id="suporteBtn">Suporte</button>
+
+<div id="suporteForm">
+  <form action="https://formsubmit.co/nosenselolclips@gmail.com" method="POST">
+    <input type="hidden" name="_next" value="">
+    <label>Email:
+      <input type="email" name="email" required>
+    </label><br>
+    <label>Mensagem:
+      <textarea name="mensagem" required></textarea>
+    </label><br>
+    <button type="submit">Enviar</button>
+  </form>
+</div>
+
   <script>
+    
+ const suporteBtn = document.getElementById('suporteBtn');
+const formSuporte = document.getElementById('suporteForm');
+
+suporteBtn.onclick = () => {
+  formSuporte.style.display = formSuporte.style.display === 'none' ? 'block' : 'none';
+  formSuporte.querySelector('input[name="_next"]').value = window.location.href;
+};
+
+
     const params = new URLSearchParams(window.location.search);
     const atendimento = params.get('atendimento');
     const posto = params.get('posto');
@@ -168,6 +195,31 @@
         atendimento,
         posto
       };
+const resAg = await fetch('https://agendamentosus.onrender.com/agendamentos');
+const agendamentosUsuario = (await resAg.json()).filter(a => a.cpf === body.cpf);
+
+const pendentes = agendamentosUsuario.filter(a => {
+  const agData = new Date(`${a.data}T${a.hora}`);
+  return agData > new Date();
+});
+
+if (pendentes.length >= 2) {
+  mensagemDiv.style.backgroundColor = '#f8d7da';
+  mensagemDiv.style.color = '#721c24';
+  mensagemDiv.textContent = 'Você já possui um agendamento pendente. Aguarde a realização antes de agendar outro.';
+  mensagemDiv.style.display = 'block';
+  botaoSubmit.disabled = false;
+  return;
+}
+
+if (agendamentosUsuario.length >= 2) {
+  mensagemDiv.style.backgroundColor = '#f8d7da';
+  mensagemDiv.style.color = '#721c24';
+  mensagemDiv.textContent = 'Limite de 2 agendamentos por CPF atingido.';
+  mensagemDiv.style.display = 'block';
+  botaoSubmit.disabled = false;
+  return;
+}
 
       try {
         const res = await fetch('https://agendamentosus.onrender.com/agendar', {
